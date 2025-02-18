@@ -19,6 +19,11 @@ import java.util.List;
 public class CategoryController {
     private final CategoryService categoryService;
 
+    @GetMapping("/echo")
+    public ResponseEntity<String> testParams(@RequestParam String name) {
+        return ResponseEntity.ok("Hello " + name);
+    }
+
     public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
     }
