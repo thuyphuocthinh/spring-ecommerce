@@ -1,5 +1,6 @@
 package com.tpt.tpt_ecom.controller;
 
+import com.tpt.tpt_ecom.config.AppConstants;
 import com.tpt.tpt_ecom.dto.CategoryDTO;
 import com.tpt.tpt_ecom.dto.CategoryResponse;
 import com.tpt.tpt_ecom.dto.CategoryUpdateDTO;
@@ -29,8 +30,13 @@ public class CategoryController {
     }
 
     @GetMapping("/public/categories")
-    public ResponseEntity<CategoryResponse> getAllCategories() {
-        return new ResponseEntity<>(categoryService.getAllCategories(), HttpStatus.OK);
+    public ResponseEntity<CategoryResponse> getAllCategories(
+            @RequestParam(name = "pageNumber", required = false, defaultValue = AppConstants.PAGE_NUMBER) Integer pageNumber,
+            @RequestParam(name = "pageSize", required = false, defaultValue = AppConstants.PAGE_SIZE) Integer pageSize,
+            @RequestParam(name = "sortBy", required = false, defaultValue = AppConstants.SORT_BY) String sortBy,
+            @RequestParam(name = "sortDirection", required = false, defaultValue = AppConstants.SORT_DIRECTION) String sortDirection
+    ) {
+        return new ResponseEntity<>(categoryService.getAllCategories(pageNumber, pageSize, sortBy, sortDirection), HttpStatus.OK);
     }
 
     // validation in request controller => validation in repo => validation in db

@@ -4,10 +4,15 @@ import com.tpt.tpt_ecom.category.CategoryRepository;
 import com.tpt.tpt_ecom.dto.CategoryDTO;
 import com.tpt.tpt_ecom.dto.CategoryResponse;
 import com.tpt.tpt_ecom.dto.CategoryUpdateDTO;
+import com.tpt.tpt_ecom.dto.PaginationMetadata;
 import com.tpt.tpt_ecom.exceptions.APIException;
 import com.tpt.tpt_ecom.model.Category;
 import com.tpt.tpt_ecom.service.CategoryService;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
@@ -32,9 +37,13 @@ public class CategoryServiceImpl implements CategoryService {
 
     private List<Category> categories;
     @Override
-    public CategoryResponse getAllCategories() {
-        List<Category> categories = this.categoryRepository.findAll();
-        CategoryResponse categoryResponse = new CategoryResponse();
+    public CategoryResponse getAllCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortDirection) {
+        Sort sortByAndDirection = sortDirection.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable page = PageRequest.of(pageNumber, pageSize, sortByAndDirection);
+        Page<Category> categoriesPage = this.categoryRepository.findAll(page);
+        List<Category> categories = categoriesPage.getContent();
+
         if (categories.isEmpty()) {
             throw new APIException("No categories found");
         }
@@ -42,7 +51,15 @@ public class CategoryServiceImpl implements CategoryService {
                 .map(category -> modelMapper.map(category, CategoryDTO.class))
                 .collect(Collectors.toList());
 
+        CategoryResponse categoryResponse = new CategoryResponse();
         categoryResponse.setCategories(categoryDTOS);
+        PaginationMetadata paginationMetadata = PaginationMetadata
+                .builder().pageNumber(categoriesPage.getNumber())
+                .pageSize(categoriesPage.getSize())
+                .totalPages(categoriesPage.getTotalPages())
+                .lastPage(categoriesPage.isLast())
+                .build();
+        categoryResponse.setPaginationMetadata(paginationMetadata);
         return categoryResponse;
     }
 
