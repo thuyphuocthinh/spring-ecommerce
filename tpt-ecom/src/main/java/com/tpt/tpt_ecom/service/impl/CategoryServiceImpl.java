@@ -1,25 +1,53 @@
 package com.tpt.tpt_ecom.service.impl;
 
+import com.tpt.tpt_ecom.category.CategoryRepository;
+import com.tpt.tpt_ecom.dto.CategoryDTO;
+import com.tpt.tpt_ecom.dto.CategoryResponse;
+import com.tpt.tpt_ecom.dto.CategoryUpdateDTO;
+import com.tpt.tpt_ecom.exceptions.APIException;
 import com.tpt.tpt_ecom.model.Category;
 import com.tpt.tpt_ecom.service.CategoryService;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
+
+    private final CategoryRepository categoryRepository;
+
+    private final ModelMapper modelMapper;
+
+    public CategoryServiceImpl(CategoryRepository categoryRepository, ModelMapper modelMapper) {
+        this.categoryRepository = categoryRepository;
+        this.modelMapper = modelMapper;
+    }
+
     private List<Category> categories;
     @Override
-    public List<Category> getAllCategories() {
-        return categories;
+    public CategoryResponse getAllCategories() {
+        List<Category> categories = this.categoryRepository.findAll();
+        CategoryResponse categoryResponse = new CategoryResponse();
+        if (categories.isEmpty()) {
+            throw new APIException("No categories found");
+        }
+        List<CategoryDTO> categoryDTOS =  categories.stream()
+                .map(category -> modelMapper.map(category, CategoryDTO.class))
+                .collect(Collectors.toList());
+
+        categoryResponse.setCategories(categoryDTOS);
+        return categoryResponse;
     }
 
     @Override
-    public Category getCategoryById(long id) {
+    public CategoryDTO getCategoryById(long id) {
         Category categoryReturn = null;
         for (Category category : categories) {
             if(category.getCategoryId() == id) {
@@ -27,40 +55,31 @@ public class CategoryServiceImpl implements CategoryService {
                 break;
             }
         }
-        return categoryReturn;
+        return modelMapper.map(categoryReturn, CategoryDTO.class);
     }
 
     @Override
-    public String createCategory(Category category) {
-        this.categories.add(category);
-        return "Category created successfully";
+    public CategoryDTO createCategory(CategoryDTO categoryDTO) {
+        Optional<Category> savedCategory = this.categoryRepository.findByName(categoryDTO.getCategoryName());
+        if(savedCategory.isPresent()) {
+            throw new APIException("Category already exists");
+        }
+        Category category = modelMapper.map(categoryDTO, Category.class);
+        this.categoryRepository.save(category);
+        return categoryDTO;
     }
 
     @Override
-    public String updateCategory(long id, Category categoryUpdate) {
+    public CategoryDTO updateCategory(long id, CategoryUpdateDTO categoryUpdateDTO) {
         // handle null with optional
         Category category = (Category) categories.stream()
                 .filter(c -> c.getCategoryId().equals(id))
                 .findFirst()
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "category not found"
-                ));
-        category.setCategoryName(categoryUpdate.getCategoryName());
+                .orElseThrow(() -> new APIException("Category not found"));
 
-//        Optional<Category> categoryOptional = categories.stream()
-//                .filter(c -> c.getCategoryId() == id)
-//                .findFirst();
-//        if(categoryOptional.isPresent()) {
-//            categoryOptional.get().setCategoryName(categoryUpdate.getCategoryName());
-//        } else {
-//            throw new ResponseStatusException(
-//                    HttpStatus.NOT_FOUND,
-//                    "category not found"
-//            );
-//        }
-
-        return "Category updated successfully";
+        category.setCategoryName(categoryUpdateDTO.getCategoryName());
+        this.categoryRepository.save(category);
+        return modelMapper.map(category, CategoryDTO.class);
     }
 
     @Override
@@ -68,10 +87,7 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = (Category) categories.stream()
                 .filter(c -> c.getCategoryId().equals(id))
                 .findFirst()
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "category not found"
-                ));
+                .orElseThrow(() -> new APIException("Category not found"));
         this.categories.remove(category);
         return "Category deleted successfully";
     }
