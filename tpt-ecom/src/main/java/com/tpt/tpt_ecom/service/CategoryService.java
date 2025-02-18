@@ -8,7 +8,12 @@ import com.tpt.tpt_ecom.model.Category;
 import java.util.List;
 
 public interface CategoryService {
-    CategoryResponse getAllCategories();
+    CategoryResponse getAllCategories(
+            Integer pageNumber,
+            Integer pageSize,
+            String sortBy,
+            String sortDirection
+    );
     CategoryDTO getCategoryById(long id);
     CategoryDTO createCategory(CategoryDTO categoryDTO);
     CategoryDTO updateCategory(long id, CategoryUpdateDTO categoryUpdateDTO);

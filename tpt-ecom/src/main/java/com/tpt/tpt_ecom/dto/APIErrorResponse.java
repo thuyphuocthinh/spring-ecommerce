@@ -4,12 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CategoryResponse {
-    private List<CategoryDTO> categories;
-    private PaginationMetadata paginationMetadata;
+public class APIErrorResponse {
+    public boolean status;
+    public String message;
 }

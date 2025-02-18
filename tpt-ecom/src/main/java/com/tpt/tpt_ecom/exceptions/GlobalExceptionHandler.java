@@ -1,7 +1,7 @@
 package com.tpt.tpt_ecom.exceptions;
 
+import com.tpt.tpt_ecom.dto.APIErrorResponse;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -29,13 +29,21 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<String> myResourceNotFoundException(ResourceNotFoundException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    public ResponseEntity<APIErrorResponse> myResourceNotFoundException(ResourceNotFoundException ex) {
+        APIErrorResponse apiErrorResponse = new APIErrorResponse(
+                false,
+                ex.getMessage()
+        );
+        return new ResponseEntity<>(apiErrorResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(APIException.class)
-    public ResponseEntity<String> apiException(APIException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<APIErrorResponse> apiException(APIException ex) {
+        APIErrorResponse apiErrorResponse = new APIErrorResponse(
+            false,
+            ex.getMessage()
+    );
+        return new ResponseEntity<>(apiErrorResponse, HttpStatus.BAD_REQUEST);
     }
 }
 
