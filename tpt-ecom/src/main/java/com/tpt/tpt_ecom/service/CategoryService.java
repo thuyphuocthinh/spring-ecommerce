@@ -1,13 +1,16 @@
 package com.tpt.tpt_ecom.service;
 
+import com.tpt.tpt_ecom.dto.CategoryDTO;
+import com.tpt.tpt_ecom.dto.CategoryResponse;
+import com.tpt.tpt_ecom.dto.CategoryUpdateDTO;
 import com.tpt.tpt_ecom.model.Category;
 
 import java.util.List;
 
 public interface CategoryService {
-    List<Category> getAllCategories();
-    Category getCategoryById(long id);
-    String createCategory(Category category);
-    String updateCategory(long id, Category category);
+    CategoryResponse getAllCategories();
+    CategoryDTO getCategoryById(long id);
+    CategoryDTO createCategory(CategoryDTO categoryDTO);
+    CategoryDTO updateCategory(long id, CategoryUpdateDTO categoryUpdateDTO);
     String deleteCategory(long id);
 }
