@@ -11,3 +11,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+project:
+  images: images/
+  baseUrl: http://localhost:8080/
