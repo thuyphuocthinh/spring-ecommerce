@@ -12,6 +12,20 @@ spring:
       hibernate:
         format_sql: true
 
+  app:
+    jwtSecret: thuyPhuocThinh_learn_spring_boot
+    jwtExpirationMs: 3000000000
+    jwtCookieName: jwt
+
 project:
   images: images/
   baseUrl: http://localhost:8080/
+
+logging:
+  level:
+    org:
+      springframework: DEBUG
+      hibernate:
+        SQL: DEBUG
+    com:
+      tpt: DEBUG
