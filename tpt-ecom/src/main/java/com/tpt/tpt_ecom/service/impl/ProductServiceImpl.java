@@ -1,13 +1,10 @@
 package com.tpt.tpt_ecom.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tpt.tpt_ecom.category.CategoryRepository;
-import com.tpt.tpt_ecom.category.ProductRepository;
-import com.tpt.tpt_ecom.dto.CategoryDTO;
+import com.tpt.tpt_ecom.repository.CategoryRepository;
+import com.tpt.tpt_ecom.repository.ProductRepository;
 import com.tpt.tpt_ecom.dto.PaginationMetadata;
 import com.tpt.tpt_ecom.dto.ProductDTO;
 import com.tpt.tpt_ecom.dto.ProductResponse;
-import com.tpt.tpt_ecom.exceptions.APIException;
 import com.tpt.tpt_ecom.exceptions.ResourceNotFoundException;
 import com.tpt.tpt_ecom.model.Category;
 import com.tpt.tpt_ecom.model.Product;
@@ -21,7 +18,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.management.relation.RelationServiceNotRegisteredException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
@@ -29,7 +25,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {

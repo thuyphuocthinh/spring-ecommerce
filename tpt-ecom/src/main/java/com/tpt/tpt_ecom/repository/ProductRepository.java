@@ -1,4 +1,4 @@
-package com.tpt.tpt_ecom.category;
+package com.tpt.tpt_ecom.repository;
 
 import com.tpt.tpt_ecom.model.Product;
 import org.springframework.data.domain.Page;
