@@ -5,6 +5,7 @@ import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -75,6 +76,15 @@ public class User {
             orphanRemoval = true
     )
     private Set<Product> products = new HashSet<>();
+
+    @ToString.Exclude
+    @OneToOne(cascade = {
+            CascadeType.PERSIST,
+            CascadeType.MERGE,
+            CascadeType.REFRESH,
+    }, orphanRemoval = true)
+    @JoinColumn(name = "cart_id")
+    private Cart cart;
 
     public User(@NotBlank @Size(min = 3, max = 20) String username, @NotBlank @Size(max = 50) @Email String email, String encode) {
     }

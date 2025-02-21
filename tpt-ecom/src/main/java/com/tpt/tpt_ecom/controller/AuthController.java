@@ -22,6 +22,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -139,13 +140,19 @@ public class AuthController {
             return "";
     }
 
-
+    // authentication => header with valid jwt
+    // this dump api haha
+    /*
+    * Represents the token for an authentication request or for an authenticated
+    * principal once the request has been processed by the AuthenticationManager.
+    * authenticate(Authentication) method.
+    * */
     @GetMapping("/user")
     public ResponseEntity<?> getUserDetails(Authentication authentication){
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
         List<String> roles = userDetails.getAuthorities().stream()
-                .map(item -> item.getAuthority())
+                .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
         UserInfoResponse response = new UserInfoResponse(userDetails.getId(),
@@ -154,7 +161,11 @@ public class AuthController {
         return ResponseEntity.ok().body(response);
     }
 
-
+    // remove jwt from cookie
+    // http request since then has become unauthenticated
+    // shortcoming: if jwt still valid but removed from cookie of client
+    // if any hacker has this jwt => they can access private resources
+    // jwt cannot be revoked if expiration time is still valid :v
     @PostMapping("/signout")
     public ResponseEntity<?> signoutUser(){
         ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
