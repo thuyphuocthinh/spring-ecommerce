@@ -11,6 +11,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        dialect: MYSQLDialect8
 
   app:
     jwtSecret: thuyPhuocThinh_learn_spring_boot

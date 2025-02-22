@@ -169,6 +169,36 @@ public class CartServiceImpl implements CartService {
         return "Success";
     }
 
+    @Override
+    public String deleteProductFromCart(Long productId) {
+        Product product = this.productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found", "id", productId));
+
+        Cart userCart = cartRepository.findCartByEmail(authUtil.loggedInEmail());
+        if(userCart == null) {
+            throw new APIException("No cart found");
+        }
+
+        CartItem cartItem = this.cartItemRepository.findCartItemByProductIdAndCartId(productId, userCart.getCartId());
+        if(cartItem == null) {
+            throw new APIException("No cart item found");
+        }
+
+        List<CartItem> cartItemList = userCart.getCartItems();
+        for(CartItem cartItem1 : cartItemList) {
+            if(cartItem1.getCartItemId().equals(productId)) {
+                cartItemList.remove(cartItem1);
+                break;
+            }
+        }
+
+        userCart.setCartItems(cartItemList);
+        this.cartRepository.save(userCart);
+        this.cartItemRepository.delete(cartItem);
+
+        return "success";
+    }
+
     private CartDTO getCartDTO(Cart updatedCart, CartDTO cartDTO) {
         List<CartItem> cartItems = updatedCart.getCartItems();
         List<CartItemDTO> cartItemDTOS = new ArrayList<>();
